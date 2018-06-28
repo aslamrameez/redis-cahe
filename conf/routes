@@ -1,0 +1,43 @@
+#Controllers to deal with a single database - SingleDbController
+
+#To add a cache with db-key mapping (10 databases Available)
+POST           /v1/cache/db/one/add                    controllers.SingleDbController.addDatabase()
+#To clear the content of a specific database
+DELETE         /v1/cache/db/one/clear                  controllers.SingleDbController.clearDatabase
+#To flush a specific database
+DELETE         /v1/cache/db/one/flush                  controllers.SingleDbController.flushDatabase
+#To get all the keys from a database
+GET            /v1/cache/db/one/retrieve               getAll()
+#To check existence of a database
+GET            /v1/cache/db/one/exists                 existsDatabase()
+
+GET            /v1/cache/db/one/conf                   controllers.SingleDbController.getDbConf()
+
+
+
+#Controllers to deal with multiple databases - MultiDbController
+
+#Count no. of databases
+GET            /v1/cache/db/all/count                  countAllDatabases()
+#Search for a key in all databases
+GET            /v1/cache/db/all/key/retrieve           retrieveValue()
+#Insert a key/value pair in all databases
+POST            /v1/cache/db/all/key/insert            insertKey()
+#Insert a key/value pair in all databases
+DELETE            /v1/cache/db/all/key/remove          removeKey()
+#List all available databases
+GET            /v1/cache/db/all/list                   controllers.MultiDbController.listAllDatabases()
+#To reset all the databases
+DELETE         /v1/cache/db/all/flush                  controllers.MultiDbController.flushAll
+
+
+#Controllers to deal with keys in a single database - KeyController
+
+#To insertKey data into database
+POST           /v1/cache/db/one/key/insert             insertKey()
+#To retrieveValue data
+GET            /v1/cache/db/one/key/retrieve           retrieveValue
+#To removeKey a specific key
+DELETE         /v1/cache/db/one/key/remove             removeKey
+#To check existence of a specific key in a database
+GET            /v1/cache/db/one/key/exists             keyExists()

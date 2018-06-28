@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: play-java-docker-k8s-starter-example-http
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 9000
+    name: play-http
+  selector:
+    app: play-java-docker-k8s-example
+  type: NodePort
