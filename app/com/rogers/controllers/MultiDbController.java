@@ -1,11 +1,12 @@
-package controllers;
+package com.rogers.controllers;
 
-import requestHandlers.CacheRequest;
-import requestHandlers.MultiDbRequest;
-import requestHandlers.MultiInsertRequest;
-import responses.ResponseMessage;
-import validators.RequestValidator;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.rogers.requestHandlers.CacheRequest;
+import com.rogers.requestHandlers.MultiDbRequest;
+import com.rogers.requestHandlers.MultiInsertRequest;
+import com.rogers.responses.ResponseMessage;
+import com.rogers.services.CacheService;
+import com.rogers.validators.RequestValidator;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -13,7 +14,6 @@ import scala.Option;
 import scala.compat.java8.FutureConverters;
 import scala.concurrent.duration.Duration;
 import scala.reflect.ClassTag$;
-import services.CacheService;
 
 import javax.inject.Inject;
 import java.util.HashMap;

@@ -1,19 +1,18 @@
-package controllers;
+package com.rogers.controllers;
 
-import requestHandlers.CacheRequest;
-import requestHandlers.KeyRequest;
-import responses.ResponseMessage;
-import validators.RequestValidator;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.rogers.requestHandlers.CacheRequest;
+import com.rogers.requestHandlers.KeyRequest;
+import com.rogers.responses.ResponseMessage;
+import com.rogers.services.CacheService;
+import com.rogers.validators.RequestValidator;
 import play.api.cache.redis.CacheAsyncApi;
-
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 import scala.Option;
 import scala.compat.java8.FutureConverters;
 import scala.concurrent.duration.Duration;
-import services.*;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;

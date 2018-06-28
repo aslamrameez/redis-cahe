@@ -1,4 +1,4 @@
-package requestHandlers;
+package com.rogers.requestHandlers;
 
 public interface MultiInsertRequest {
 }

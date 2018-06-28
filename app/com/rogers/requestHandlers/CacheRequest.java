@@ -1,6 +1,7 @@
-package requestHandlers;
+package com.rogers.requestHandlers;
 
 import play.data.validation.Constraints;
+
 import javax.validation.groups.Default;
 import java.util.Map;
 

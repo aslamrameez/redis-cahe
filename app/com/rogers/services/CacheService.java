@@ -1,6 +1,6 @@
-package services;
+package com.rogers.services;
 
-import responses.ResponseMessage;
+import com.rogers.responses.ResponseMessage;
 import play.api.cache.redis.CacheAsyncApi;
 import play.api.cache.redis.RedisList;
 import play.cache.NamedCache;
@@ -12,10 +12,11 @@ import scala.concurrent.duration.Duration;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
-
 
 
 @Singleton

@@ -1,43 +1,43 @@
 #Controllers to deal with a single database - SingleDbController
 
 #To add a cache with db-key mapping (10 databases Available)
-POST           /v1/cache/db/one/add                    controllers.SingleDbController.addDatabase()
+POST           /v1/cache/db/one/add                    com.rogers.controllers.SingleDbController.addDatabase()
 #To clear the content of a specific database
-DELETE         /v1/cache/db/one/clear                  controllers.SingleDbController.clearDatabase
+DELETE         /v1/cache/db/one/clear                  com.rogers.controllers.SingleDbController.clearDatabase
 #To flush a specific database
-DELETE         /v1/cache/db/one/flush                  controllers.SingleDbController.flushDatabase
+DELETE         /v1/cache/db/one/flush                  com.rogers.controllers.SingleDbController.flushDatabase
 #To get all the keys from a database
-GET            /v1/cache/db/one/retrieve               getAll()
+GET            /v1/cache/db/one/retrieve               com.rogers.controllers.SingleDbController.getAll()
 #To check existence of a database
-GET            /v1/cache/db/one/exists                 existsDatabase()
+GET            /v1/cache/db/one/exists                 com.rogers.controllers.SingleDbController.existsDatabase()
 
-GET            /v1/cache/db/one/conf                   controllers.SingleDbController.getDbConf()
+GET            /v1/cache/db/one/conf                   com.rogers.controllers.SingleDbController.getDbConf()
 
 
 
 #Controllers to deal with multiple databases - MultiDbController
 
 #Count no. of databases
-GET            /v1/cache/db/all/count                  countAllDatabases()
+GET            /v1/cache/db/all/count                  com.rogers.controllers.MultiDbController.countAllDatabases()
 #Search for a key in all databases
-GET            /v1/cache/db/all/key/retrieve           retrieveValue()
+GET            /v1/cache/db/all/key/retrieve           com.rogers.controllers.MultiDbController.retrieveValue()
 #Insert a key/value pair in all databases
-POST            /v1/cache/db/all/key/insert            insertKey()
+POST            /v1/cache/db/all/key/insert            com.rogers.controllers.MultiDbController.insertKey()
 #Insert a key/value pair in all databases
-DELETE            /v1/cache/db/all/key/remove          removeKey()
+DELETE            /v1/cache/db/all/key/remove          com.rogers.controllers.MultiDbController.removeKey()
 #List all available databases
-GET            /v1/cache/db/all/list                   controllers.MultiDbController.listAllDatabases()
+GET            /v1/cache/db/all/list                   com.rogers.controllers.MultiDbController.listAllDatabases()
 #To reset all the databases
-DELETE         /v1/cache/db/all/flush                  controllers.MultiDbController.flushAll
+DELETE         /v1/cache/db/all/flush                  com.rogers.controllers.MultiDbController.flushAll
 
 
 #Controllers to deal with keys in a single database - KeyController
 
 #To insertKey data into database
-POST           /v1/cache/db/one/key/insert             insertKey()
+POST           /v1/cache/db/one/key/insert             com.rogers.controllers.KeyController.insertKey()
 #To retrieveValue data
-GET            /v1/cache/db/one/key/retrieve           retrieveValue
+GET            /v1/cache/db/one/key/retrieve           com.rogers.controllers.KeyController.retrieveValue
 #To removeKey a specific key
-DELETE         /v1/cache/db/one/key/remove             removeKey
+DELETE         /v1/cache/db/one/key/remove             com.rogers.controllers.KeyController.removeKey
 #To check existence of a specific key in a database
-GET            /v1/cache/db/one/key/exists             keyExists()
+GET            /v1/cache/db/one/key/exists             com.rogers.controllers.KeyController.keyExists()

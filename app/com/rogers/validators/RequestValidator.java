@@ -1,13 +1,14 @@
-package validators;
+package com.rogers.validators;
 
-import requestHandlers.CacheRequest;
-import responses.ResponseMessage;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rogers.requestHandlers.CacheRequest;
+import com.rogers.responses.ResponseMessage;
 import play.data.Form;
 import play.data.FormFactory;
 import play.data.validation.ValidationError;
 import play.mvc.Http;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
