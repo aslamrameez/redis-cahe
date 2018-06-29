@@ -1,4 +1,4 @@
-package com.rogers.requestHandlers;
+package com.rogers.request;
 
 import play.data.validation.Constraints;
 
@@ -15,7 +15,6 @@ public class CacheRequest {
     private Map<String, Object> value;
     @Constraints.Required(message = "expire is required",groups = {Default.class,MultiInsertRequest.class})
     private Boolean expire;
-
     private Integer ttl;
     @Constraints.Required(message = "pattern is required", groups = {DatabaseRequest.class})
     private String pattern;

@@ -1,6 +1,6 @@
-package com.rogers.services;
+package com.rogers.service;
 
-import com.rogers.responses.ResponseMessage;
+import com.rogers.response.ResponseMessage;
 import play.api.cache.redis.CacheAsyncApi;
 import play.api.cache.redis.RedisList;
 import play.cache.NamedCache;
@@ -138,7 +138,7 @@ public class CacheService {
         return checkDbExistence(database)
             .thenCombineAsync(countAvailableDbs(),(exists,count)->{
                 if(exists)
-                    return new ResponseMessage(400,"Cache with same database name existsKey.");
+                    return new ResponseMessage(400,"Cache with same database name exists.");
 
                 if(count==size){
                     return new ResponseMessage(400,"All Databases are Occupied");
@@ -161,7 +161,6 @@ public class CacheService {
                                             map.put("cache",value);
                                             dbKeyCache.set(database,map, Duration.apply(30, TimeUnit.DAYS));
                                             dbKeyCache.increment("default",1);
-                                            System.out.println(map);
                                             redisList.headPop();
                             });
                             }

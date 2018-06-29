@@ -1,11 +1,13 @@
 package com.rogers.controllers;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.rogers.requestHandlers.CacheRequest;
-import com.rogers.requestHandlers.KeyRequest;
-import com.rogers.responses.ResponseMessage;
-import com.rogers.services.CacheService;
-import com.rogers.validators.RequestValidator;
+import com.rogers.constants.RogersConstants;
+import com.rogers.request.CacheRequest;
+import com.rogers.request.KeyRequest;
+import com.rogers.response.ResponseMessage;
+import com.rogers.service.CacheService;
+import com.rogers.validator.Annotations.PostBodyValidator;
+import com.rogers.validator.Annotations.QueryParamsValidator;
 import play.api.cache.redis.CacheAsyncApi;
 import play.libs.Json;
 import play.mvc.Controller;
@@ -16,37 +18,35 @@ import scala.concurrent.duration.Duration;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.validation.groups.Default;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
 
+import static com.rogers.validator.RequestValidator.insertRequestValidator;
+
 @Singleton
 public class KeyController extends Controller {
 
-    private RequestValidator requestValidator;
     private CacheService cacheService;
 
     @Inject
-    public KeyController(RequestValidator requestValidator, CacheService cacheService) {
-        this.requestValidator = requestValidator;
+    public KeyController(CacheService cacheService) {
         this.cacheService = cacheService;
     }
 
+    @PostBodyValidator()
     public CompletionStage<Result> insertKey() {
 
-        final Object object;
         final CompletionStage<Object> completionStage;
+        final CacheRequest cacheRequest;
 
-        object = requestValidator.insertRequestValidator(request(),Default.class);
-
-        if(object instanceof ResponseMessage){
-            ResponseMessage responseMessage = (ResponseMessage) object;
-            return CompletableFuture.completedFuture(status(responseMessage.getStatus(), Json.toJson(responseMessage)));
+        try {
+            cacheRequest = insertRequestValidator(request());
+        } catch (Exception e) {
+            ResponseMessage responseMessage = new ResponseMessage(400,e.getMessage());
+            return CompletableFuture.completedFuture(status(responseMessage.getStatus(),Json.toJson(responseMessage)));
         }
-
-        CacheRequest cacheRequest = (CacheRequest) object;
 
         completionStage = cacheService.getKeyDatabase(cacheRequest.getDatabase(), cacheRequest.getKey());
 
@@ -68,19 +68,11 @@ public class KeyController extends Controller {
        });
     }
 
+    @QueryParamsValidator(KeyRequest.class)
     public CompletionStage<Result> retrieveValue() {
 
-        final Object object;
         final CompletionStage<Object> completionStage;
-
-        object = requestValidator.requestValidator(request(),KeyRequest.class);
-
-        if(object instanceof ResponseMessage){
-            ResponseMessage responseMessage = (ResponseMessage) object;
-            return CompletableFuture.completedFuture(status(responseMessage.getStatus(), Json.toJson(responseMessage)));
-        }
-
-        CacheRequest cacheRequest = (CacheRequest) object;
+        final CacheRequest cacheRequest = (CacheRequest) ctx().args.get(RogersConstants.REQUEST_OBJECT);
 
         completionStage = cacheService.getKeyDatabase(cacheRequest.getDatabase(),cacheRequest.getKey());
 
@@ -89,9 +81,9 @@ public class KeyController extends Controller {
                return FutureConverters.toJava(((CacheAsyncApi)completionStage1).get(cacheRequest.getKey(), scala.reflect.ClassTag$.MODULE$.apply(HashMap.class)))
                         .thenApply((value)->{
                             ObjectNode jsonResponse = Json.newObject();
-                            jsonResponse.put("status",200);
-                            jsonResponse.put("message","Value Stored at " + cacheRequest.getKey() + " is " + ((Option) value).get().toString());
-                            jsonResponse.putPOJO("value",((Option) value).get());
+                            jsonResponse.put(RogersConstants.RESPONSE_STATUS,200);
+                            jsonResponse.put(RogersConstants.RESPONSE_MESSAGE,"Value Stored at " + cacheRequest.getKey() + " is " + ((Option) value).get().toString());
+                            jsonResponse.putPOJO(RogersConstants.RESPONSE_VALUE,((Option) value).get());
                             return ok(jsonResponse);
                         }).exceptionally((throwable) -> {
                             ResponseMessage responseMessage;
@@ -106,19 +98,11 @@ public class KeyController extends Controller {
 
     } // Haven't used ResponseMessage
 
+    @QueryParamsValidator(KeyRequest.class)
     public CompletionStage<Result> removeKey() {
 
-        final Object object;
         final CompletionStage<Object> completionStage;
-
-        object = requestValidator.requestValidator(request(),KeyRequest.class);
-
-        if(object instanceof ResponseMessage){
-            ResponseMessage responseMessage = (ResponseMessage) object;
-            return CompletableFuture.completedFuture(status(responseMessage.getStatus(), Json.toJson(responseMessage)));
-        }
-
-        CacheRequest cacheRequest = (CacheRequest) object;
+        final CacheRequest cacheRequest = (CacheRequest) ctx().args.get(RogersConstants.REQUEST_OBJECT);
 
         completionStage = cacheService.getKeyDatabase(cacheRequest.getDatabase(),cacheRequest.getKey());
 
@@ -142,20 +126,13 @@ public class KeyController extends Controller {
         });
     }
 
+    @QueryParamsValidator(KeyRequest.class)
     public CompletionStage<Result> existsKey(){
 
-        final Object object;
         final CompletionStage<Object> completionStage;
+        final CacheRequest cacheRequest;
 
-        object = requestValidator.requestValidator(request(),KeyRequest.class);
-
-        if(object instanceof ResponseMessage){
-            ResponseMessage responseMessage = (ResponseMessage) object;
-            return CompletableFuture.completedFuture(status(responseMessage.getStatus(), Json.toJson(responseMessage)));
-        }
-
-        CacheRequest cacheRequest = (CacheRequest) object;
-
+        cacheRequest = (CacheRequest) ctx().args.get(RogersConstants.REQUEST_OBJECT);
         completionStage = cacheService.getKeyDatabase(cacheRequest.getDatabase(),cacheRequest.getKey());
 
         return completionStage.thenCompose(completionStage1->{

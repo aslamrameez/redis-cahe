@@ -1,12 +1,15 @@
 package com.rogers.controllers;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.rogers.requestHandlers.CacheRequest;
-import com.rogers.requestHandlers.MultiDbRequest;
-import com.rogers.requestHandlers.MultiInsertRequest;
-import com.rogers.responses.ResponseMessage;
-import com.rogers.services.CacheService;
-import com.rogers.validators.RequestValidator;
+import com.rogers.constants.RogersConstants;
+import com.rogers.request.CacheRequest;
+import com.rogers.request.MultiDbRequest;
+import com.rogers.request.MultiInsertRequest;
+import com.rogers.response.ResponseMessage;
+import com.rogers.service.CacheService;
+import com.rogers.validator.Annotations.PostBodyValidator;
+import com.rogers.validator.Annotations.QueryParamsValidator;
+import com.rogers.validator.RequestValidator;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -22,6 +25,8 @@ import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import static com.rogers.validator.RequestValidator.insertRequestValidator;
+
 public class MultiDbController extends Controller {
 
     private RequestValidator requestValidator;
@@ -32,6 +37,7 @@ public class MultiDbController extends Controller {
         this.requestValidator = requestValidator;
         this.cacheService = cacheService;
     }
+
 
     public Result flushAll() {
 
@@ -77,25 +83,19 @@ public class MultiDbController extends Controller {
         return cacheService.getAvailableDbs()
                         .thenApply((list)->{
                             ObjectNode jsonResponse = Json.newObject();
-                            jsonResponse.put("status",200);
+                            jsonResponse.put(RogersConstants.RESPONSE_STATUS,200);
                             jsonResponse.put("No. of key/value pairs",list.size());
                             jsonResponse.putPOJO("Keys Present",Json.toJson(list));
                             return ok(jsonResponse);
                                 });
     }
 
+    @QueryParamsValidator(MultiDbRequest.class)
     public CompletionStage<Result> retrieveValue(){
 
-        final Object object;
+       final CacheRequest cacheRequest;
 
-        object = requestValidator.requestValidator(request(), MultiDbRequest.class);
-
-        if(object instanceof ResponseMessage){
-            ResponseMessage responseMessage = (ResponseMessage) object;
-            return CompletableFuture.completedFuture(status(responseMessage.getStatus(), Json.toJson(responseMessage)));
-        }
-
-        CacheRequest cacheRequest = (CacheRequest) object;
+       cacheRequest = (CacheRequest) ctx().args.get(RogersConstants.REQUEST_OBJECT);
 
           return  cacheService
                     .getAvailableDbs()
@@ -107,9 +107,9 @@ public class MultiDbController extends Controller {
                                 cacheService.getCache(database)
                                         .thenCompose(cacheAsyncApi -> FutureConverters.toJava(cacheAsyncApi.get(cacheRequest.getKey(), ClassTag$.MODULE$.apply(HashMap.class)))
                                                 .thenAccept((value)->{
-                                                    jsonResponse.put("status",200);
-                                                    jsonResponse.put("message","Value Stored at " + cacheRequest.getKey() + " is " + ((Option) value).get().toString());
-                                                    jsonResponse.putPOJO("value",((Option) value).get());
+                                                    jsonResponse.put(RogersConstants.RESPONSE_STATUS,200);
+                                                    jsonResponse.put(RogersConstants.RESPONSE_MESSAGE,"Value Stored at " + cacheRequest.getKey() + " is " + ((Option) value).get().toString());
+                                                    jsonResponse.putPOJO(RogersConstants.RESPONSE_VALUE,((Option) value).get());
                                                 }))
                                 .toCompletableFuture()
                                         .get();
@@ -127,18 +127,17 @@ public class MultiDbController extends Controller {
     }
     //Need Refactoring.. Used completableFuture.get() method
 
+    @PostBodyValidator(MultiInsertRequest.class)
     public CompletionStage<Result> insertKey(){
 
-        final Object object;
+        final CacheRequest cacheRequest;
 
-        object = requestValidator.insertRequestValidator(request(),MultiInsertRequest.class);
-
-        if(object instanceof ResponseMessage){
-            ResponseMessage responseMessage = (ResponseMessage) object;
-            return CompletableFuture.completedFuture(status(responseMessage.getStatus(), Json.toJson(responseMessage)));
+        try {
+            cacheRequest = insertRequestValidator(request());
+        } catch (Exception e) {
+            ResponseMessage responseMessage = new ResponseMessage(400,e.getMessage());
+            return CompletableFuture.completedFuture(status(responseMessage.getStatus(),Json.toJson(responseMessage)));
         }
-
-        CacheRequest cacheRequest = (CacheRequest) object;
 
         return  cacheService
                 .getAvailableDbs()
@@ -154,19 +153,12 @@ public class MultiDbController extends Controller {
                 });
     }
 
+    @QueryParamsValidator(MultiDbRequest.class)
     public CompletionStage<Result> removeKey(){
 
-        final Object object;
+        final CacheRequest cacheRequest;
 
-        object = requestValidator.requestValidator(request(), MultiDbRequest.class);
-
-        if(object instanceof ResponseMessage){
-            ResponseMessage responseMessage = (ResponseMessage) object;
-            return CompletableFuture.completedFuture(status(responseMessage.getStatus(), Json.toJson(responseMessage)));
-        }
-
-
-        CacheRequest cacheRequest = (CacheRequest) object;
+        cacheRequest = (CacheRequest) ctx().args.get(RogersConstants.REQUEST_OBJECT);
 
         return  cacheService
                 .getAvailableDbs()
@@ -181,4 +173,5 @@ public class MultiDbController extends Controller {
                     return status(responseMessage.getStatus(), Json.toJson(responseMessage));
                 });
     }
+
 }

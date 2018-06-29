@@ -1,11 +1,14 @@
 package com.rogers.controllers;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.rogers.requestHandlers.CacheRequest;
-import com.rogers.requestHandlers.DatabaseRequest;
-import com.rogers.responses.ResponseMessage;
-import com.rogers.services.CacheService;
-import com.rogers.validators.RequestValidator;
+import com.rogers.constants.RogersConstants;
+import com.rogers.request.CacheRequest;
+import com.rogers.request.DatabaseRequest;
+import com.rogers.response.ResponseMessage;
+import com.rogers.service.CacheService;
+import com.rogers.validator.Annotations.PostBodyValidator;
+import com.rogers.validator.Annotations.QueryParamsValidator;
+import com.rogers.validator.RequestValidator;
 import play.api.cache.redis.CacheAsyncApi;
 import play.libs.Json;
 import play.mvc.Controller;
@@ -30,19 +33,13 @@ public class SingleDbController extends Controller {
         this.cacheService = cacheService;
     }
 
+    @PostBodyValidator(DatabaseRequest.class)
     public CompletionStage<Result> addDatabase(){
 
-        final Object object;
+        final CacheRequest cacheRequest;
         final CompletionStage<ResponseMessage> completionStage;
 
-        object = requestValidator.requestValidator(request(), DatabaseRequest.class);
-
-        if(object instanceof ResponseMessage){
-            ResponseMessage responseMessage = (ResponseMessage) object;
-            return CompletableFuture.completedFuture(status(responseMessage.getStatus(),Json.toJson(responseMessage)));
-        }
-
-        CacheRequest cacheRequest = (CacheRequest) object;
+        cacheRequest = (CacheRequest) ctx().args.get(RogersConstants.REQUEST_OBJECT);
         completionStage = cacheService.addNewDatabase(cacheRequest.getDatabase(), cacheRequest.getPattern());
 
         return completionStage.thenApply(responseMessage ->
@@ -50,19 +47,13 @@ public class SingleDbController extends Controller {
         );
     }//Adds a database according to user request
 
+    @QueryParamsValidator(DatabaseRequest.class)
     public CompletionStage<Result> clearDatabase() {
 
-        final Object object;
+        final CacheRequest cacheRequest;
         final CompletionStage<Object> completionStage;
 
-        object = requestValidator.requestValidator(request(), DatabaseRequest.class);
-
-        if(object instanceof ResponseMessage){
-            ResponseMessage responseMessage = (ResponseMessage) object;
-            return CompletableFuture.completedFuture(status(responseMessage.getStatus(),Json.toJson(responseMessage)));
-        }
-
-        CacheRequest cacheRequest = (CacheRequest) object;
+        cacheRequest = (CacheRequest) ctx().args.get(RogersConstants.REQUEST_OBJECT);
 
         completionStage = cacheService.getPatternDatabase(cacheRequest.getDatabase(),cacheRequest.getPattern(),"removeKey");
 
@@ -82,19 +73,13 @@ public class SingleDbController extends Controller {
 
     } // Deleting the content in a specific database
 
+    @QueryParamsValidator(DatabaseRequest.class)
     public CompletionStage<Result> flushDatabase(){
 
-        final Object object;
+        final CacheRequest cacheRequest;
         final CompletionStage<Object> completionStage;
 
-        object = requestValidator.requestValidator(request(), DatabaseRequest.class);
-
-        if(object instanceof ResponseMessage){
-            ResponseMessage responseMessage = (ResponseMessage) object;
-            return CompletableFuture.completedFuture(status(responseMessage.getStatus(),Json.toJson(responseMessage)));
-        }
-
-        CacheRequest cacheRequest = (CacheRequest) object;
+        cacheRequest = (CacheRequest) ctx().args.get(RogersConstants.REQUEST_OBJECT);
         completionStage = cacheService.getPatternDatabase(cacheRequest.getDatabase(),cacheRequest.getPattern(),"flush");
 
         return completionStage.thenApply(completionStage1->{
@@ -112,20 +97,13 @@ public class SingleDbController extends Controller {
         });
     }  // Deleting the whole database
 
+    @QueryParamsValidator(DatabaseRequest.class)
     public CompletionStage<Result> getAll(){
 
-        final Object object;
+        final CacheRequest cacheRequest;
         final CompletionStage<Object> completionStage;
 
-        object = requestValidator.requestValidator(request(), DatabaseRequest.class);
-
-        if(object instanceof ResponseMessage){
-            ResponseMessage responseMessage = (ResponseMessage) object;
-            return CompletableFuture.completedFuture(status(responseMessage.getStatus(),Json.toJson(responseMessage)));
-        }
-
-        CacheRequest cacheRequest = (CacheRequest) object;
-
+        cacheRequest = (CacheRequest) ctx().args.get(RogersConstants.REQUEST_OBJECT);
         completionStage = cacheService.getPatternDatabase(cacheRequest.getDatabase(),cacheRequest.getPattern(),"fetch");
 
         return completionStage.thenCompose(completionStage1->{
@@ -136,7 +114,7 @@ public class SingleDbController extends Controller {
                                     Seq<String> seq = (Seq<String>) list;
                                     List<String> list1 = scala.collection.JavaConversions.seqAsJavaList(seq);
                                     ObjectNode jsonResponse = Json.newObject();
-                                    jsonResponse.put("status", 200);
+                                    jsonResponse.put(RogersConstants.RESPONSE_STATUS, 200);
                                     jsonResponse.put("No. of key/value pairs", list1.size());
                                     jsonResponse.putPOJO("Keys Present", Json.toJson(list1));
                                     return ok(jsonResponse);
@@ -148,19 +126,12 @@ public class SingleDbController extends Controller {
         });
 }
 
+    @QueryParamsValidator(DatabaseRequest.class)
     public CompletionStage<Result> existsDatabase(){
 
-        final Object object;
+        final CacheRequest cacheRequest;
 
-        object = requestValidator.requestValidator(request(), DatabaseRequest.class);
-
-        if(object instanceof ResponseMessage){
-            ResponseMessage responseMessage = (ResponseMessage) object;
-            return CompletableFuture.completedFuture(status(responseMessage.getStatus(), Json.toJson(responseMessage)));
-        }
-
-        CacheRequest cacheRequest = (CacheRequest) object;
-
+        cacheRequest = (CacheRequest) ctx().args.get(RogersConstants.REQUEST_OBJECT);
         return cacheService.checkDbExistence(cacheRequest.getDatabase())
                 .thenApply(aBoolean -> {
                     ResponseMessage responseMessage;
@@ -169,18 +140,12 @@ public class SingleDbController extends Controller {
                 });
     }
 
+    @QueryParamsValidator(DatabaseRequest.class)
     public CompletionStage<Result> getDbConf(){
 
-        final Object object;
+        final CacheRequest cacheRequest;
 
-        object = requestValidator.requestValidator(request(), DatabaseRequest.class);
-
-        if(object instanceof ResponseMessage){
-            ResponseMessage responseMessage = (ResponseMessage) object;
-            return CompletableFuture.completedFuture(status(responseMessage.getStatus(),Json.toJson(responseMessage)));
-        }
-
-        CacheRequest cacheRequest = (CacheRequest) object;
+        cacheRequest = (CacheRequest) ctx().args.get(RogersConstants.REQUEST_OBJECT);
 
         return cacheService.getCacheConfigruration(cacheRequest.getDatabase())
                             .thenApply(map->{
@@ -189,12 +154,12 @@ public class SingleDbController extends Controller {
                                 }
                                 return map;
                             })
-                            .thenApply(object1->{
+                            .thenApply(object->{
                                 if(object instanceof ResponseMessage){
-                                    ResponseMessage responseMessage = ((ResponseMessage) object1);
+                                    ResponseMessage responseMessage = ((ResponseMessage) object);
                                     return status(responseMessage.getStatus(),Json.toJson(responseMessage));
                                 }
-                                return ok(Json.toJson(object1));
+                                return ok(Json.toJson(object));
                             });
 
     }

@@ -1,4 +1,4 @@
-package com.rogers.requestHandlers;
+package com.rogers.request;
 
 public interface MultiDbRequest {
 }

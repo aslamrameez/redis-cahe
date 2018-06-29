@@ -10,7 +10,7 @@ DELETE         /v1/cache/db/one/flush                  com.rogers.controllers.Si
 GET            /v1/cache/db/one/retrieve               com.rogers.controllers.SingleDbController.getAll()
 #To check existence of a database
 GET            /v1/cache/db/one/exists                 com.rogers.controllers.SingleDbController.existsDatabase()
-
+#To get cache used for a specific db (ADMIN USE)
 GET            /v1/cache/db/one/conf                   com.rogers.controllers.SingleDbController.getDbConf()
 
 
@@ -40,4 +40,4 @@ GET            /v1/cache/db/one/key/retrieve           com.rogers.controllers.Ke
 #To removeKey a specific key
 DELETE         /v1/cache/db/one/key/remove             com.rogers.controllers.KeyController.removeKey
 #To check existence of a specific key in a database
-GET            /v1/cache/db/one/key/exists             com.rogers.controllers.KeyController.keyExists()
+GET            /v1/cache/db/one/key/exists             com.rogers.controllers.KeyController.existsKey()

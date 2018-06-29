@@ -1,4 +1,4 @@
-package com.rogers.responses;
+package com.rogers.response;
 
 public class ResponseMessage {
 
